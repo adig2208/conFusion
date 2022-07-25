@@ -8,6 +8,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { DishService } from './services/dish.service';
+import { LeaderService } from './services/leader.service';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import 'hammerjs';
@@ -41,7 +42,10 @@ import { ContactComponent } from './contact/contact.component';
     MatButtonModule,
     FlexLayoutModule
   ],
-  providers: [DishService],
+  providers: [
+    DishService,
+    LeaderService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
