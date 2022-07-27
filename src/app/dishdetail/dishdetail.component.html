@@ -5,7 +5,7 @@
             <mat-card>
                 <mat-card-header>
                     <mat-card-title>
-                        <h3>{{dish.name | uppercase}}</h3>
+                        <h3 *ngIf="dish">{{dish.name | uppercase}}</h3>
                     </mat-card-title>
                 </mat-card-header>
                 <img mat-card-image src={{dish.image}} alt={{dish.name}}>
@@ -14,9 +14,12 @@
                     </p>
                 </mat-card-content>
                 <mat-card-actions>
+                    <button mat-button [routerLink]="['/dishdetail', prev]"><span class="fa fa-chevron-left fa-lg"></span></button>
                     <button mat-button (click)="goBack()">BACK</button>
                     <button mat-button>LIKE</button>
                     <button mat-button>SHARE</button>
+                    <button mat-button [routerLink]="['/dishdetail', next]"><span class="fa fa-chevron-right fa-lg"></span></button>
+                    <span class="flex-spacer"></span>
                 </mat-card-actions>
             </mat-card>
         </div>
@@ -25,23 +28,58 @@
 
     <div fxFlex="40">
         <div fxFlex *ngIf="dish">
-            <mat-card>
-                <mat-card-header>
-                    <mat-card-title>
-                        <h3>Comments</h3>
-                    </mat-card-title>
-                </mat-card-header>
-                <div *ngFor="let com of dish.comments">
-                    <mat-list-item>
-                        <mat-list>
-                            <p>{{com.comment}}</p>
-                            <p>{{com.rating}} stars</p>
-                            <p>-- {{com.author}} {{com.date | date}} </p>
-                        </mat-list>
+            <mat-list>
+                <h3>Comments</h3>
+
+                <div >
+                    <mat-list-item *ngFor="let com of dish.comments">
+                        
+                            <p mat-line>{{com.comment}}</p>
+                            <p mat-line>{{com.rating}} stars</p>
+                            <p mat-line>-- {{com.author}} {{com.date | date}} </p>
+                        
                     </mat-list-item>
-                </div>
-            </mat-card>
+                    <mat-list-item *ngIf="contactForm.valid">
+      
+                        <p matLine>{{contactForm.value.comment}}</p>
+                        <p matLine>{{contactForm.value.rating}} Stars</p>
+                        <p matLine>-- {{contactForm.value.author}}</p>
+          
+                    </mat-list-item>
+                
+                </div>    
+            </mat-list>
+                <form novalidate [formGroup]="contactForm" #fform="ngForm" (ngSubmit)="onSubmit()">
+                    <p>
+                      <mat-form-field class="full-width" style="
+                      display: inline;">
+                          <input matInput formControlName="author" placeholder="Name" type="text" required>
+                          <mat-error *ngIf="formErrors.author">{{formErrors.author}}</mat-error>
+                        </mat-form-field>
+                      </p>
+                      <p>
+                        <mat-slider formControlName="rating" 
+                        max="5"
+                        step="1"
+                        thumbLabel
+                        tickInterval="1">
+                      </mat-slider>
+                    </p>
+                        <p>
+                          <mat-form-field class="full-width" style="
+                          display: inline;">
+                            <textarea matInput formControlName="comment" placeholder="Comment" rows=10></textarea>
+                            <mat-error *ngIf="formErrors.comment">{{formErrors.comment}}</mat-error>
+                          </mat-form-field>
+                        </p>
+                        <button type="submit" mat-button class="background-primary text-floral-white"[disabled]="fform.invalid">Submit</button>
+                      </form>
+                      
+            
         </div>
     </div>
-
+    <div [hidden]="dish">
+        <mat-spinner></mat-spinner><h4>Loading . . . Please Wait</h4>
+      </div>
+      
 </div>
