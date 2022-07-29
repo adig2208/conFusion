@@ -23,6 +23,8 @@ export class DishdetailComponent implements OnInit {
   dishIds: string[];
   prev: string;
   next: string;
+  dishcopy: dish;
+  dishErrMess: string;
   formErrors = {
     'author': '',
     'comment':''
@@ -50,15 +52,20 @@ export class DishdetailComponent implements OnInit {
      }
     
     ngOnInit() {
-      this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds);
-      this.route.params.pipe(switchMap((params: Params) => this.dishservice.getDish(params['id'])))
-      .subscribe(dish => { this.dish = dish; this.setPrevNext(dish.id); });
+      this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds,
+        disherrmess => this.dishErrMess = <any>disherrmess);
+        this.route.params
+        .pipe(switchMap((params: Params) => this.dishservice.getDish(params['id'])))
+        .subscribe(dish => { this.dish = dish; this.dishcopy = dish; this.setPrevNext(dish.id); },
+          errmess => this.dishErrMess = <any>errmess );
     }
   
     setPrevNext(dishId: string) {
       const index = this.dishIds.indexOf(dishId);
-      this.prev = this.dishIds[(this.dishIds.length + index - 1) % this.dishIds.length];
-      this.next = this.dishIds[(this.dishIds.length + index + 1) % this.dishIds.length];
+      this.prev = this.dishIds[(this.dishIds.length + index - 1) % this.dishIds.length],
+      disherrmess => this.dishErrMess = <any>disherrmess;
+      this.next = this.dishIds[(this.dishIds.length + index + 1) % this.dishIds.length],
+      disherrmess => this.dishErrMess = <any>disherrmess;
     }
 
   goBack(): void {
@@ -71,7 +78,8 @@ export class DishdetailComponent implements OnInit {
       rating: ''
     });
     this.contactForm.valueChanges
-      .subscribe(data => this.onValueChanged(data));
+      .subscribe(data => this.onValueChanged(data),
+      disherrmess => this.dishErrMess = <any>disherrmess);
 
     this.onValueChanged(); // (re)set validation messages now
   }
@@ -100,7 +108,12 @@ export class DishdetailComponent implements OnInit {
   onSubmit() {
     this.comment = this.contactForm.value;
     this.comment.date = new Date().toISOString();
-    this.dish.comments.push(this.comment);
+    this.dishcopy.comments.push(this.comment);
+    this.dishservice.putDish(this.dishcopy)
+      .subscribe(dish => {
+        this.dish = dish; this.dishcopy = dish;
+      },
+      errmess => { this.dish = null; this.dishcopy = null; this.dishErrMess = <any>errmess; });
     console.log(this.comment);
     this.contactForm.reset({
       author: '',
