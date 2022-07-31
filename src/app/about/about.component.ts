@@ -23,12 +23,15 @@ import { flyInOut,visibility,expand } from '../animations/app.animation';
 export class AboutComponent implements OnInit {
 
   leaders: leader[];
+  dishErrMess: string;
   constructor(private leaderService: LeaderService,
     @Inject('BaseURL') private BaseURL) { }
 
   ngOnInit() {
     this.leaderService.getLeaders()
-    .subscribe(leaders=>this.leaders = leaders);
+    .subscribe(leaders => this.leaders = leaders,
+      disherrmess => this.dishErrMess = <any>disherrmess);
   }
+
 
 }

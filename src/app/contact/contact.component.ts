@@ -1,7 +1,10 @@
-import { Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild,Inject} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Feedback, ContactType } from '../shared/feedback';
 import { flyInOut,visibility,expand } from '../animations/app.animation';
+import { FeedbackService } from '../services/feedback.service';
+import { ThrowStmt } from '@angular/compiler';
+
 @Component({
   selector: 'app-contact',
   templateUrl: './contact.component.html',
@@ -20,6 +23,9 @@ export class ContactComponent implements OnInit {
 
   feedbackForm: FormGroup;
   feedback: Feedback;
+  feedcopy: Feedback;
+  dishErrMess: string;
+  visibility = 'shown';
   contactType = ContactType;
   @ViewChild('fform') feedbackFormDirective;
 
@@ -50,10 +56,13 @@ export class ContactComponent implements OnInit {
       'email':         'Email not in valid format.'
     },
   };
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder,
+    private feedbackservice: FeedbackService,
+    @Inject('BaseURL') private BaseURL) {
     this.createForm();
   }
   ngOnInit() {
+    
   }
 
   createForm() : void {
@@ -92,20 +101,33 @@ export class ContactComponent implements OnInit {
     }
   }
 
+resetForm(){
+  this.feedbackForm.reset({
+    firstname: '',
+    lastname: '',
+    telnum: '',
+    email: '',
+    agree: false,
+    contacttype: 'None',
+    message: ''
+  });
+  
 
+}
   onSubmit() {
     this.feedback = this.feedbackForm.value;
+    this.feedcopy =this.feedback;
+    this.feedbackservice.submitFeedback(this.feedcopy)
+      .subscribe(Feedback => {
+        this.feedback = Feedback; this.feedcopy = Feedback;
+      },
+      errmess => { this.feedback = null; this.feedcopy = null; this.dishErrMess = <any>errmess; });
     console.log(this.feedback);
-    this.feedbackForm.reset({
-      firstname: '',
-      lastname: '',
-      telnum: '',
-      email: '',
-      agree: false,
-      contacttype: 'None',
-      message: ''
-    });
-    
+    this.feedbackservice.getFeaturedFeedback()
+    .subscribe(feedback=>this.feedback = feedback,
+    disherrmess => this.dishErrMess = <any>disherrmess);
+    setTimeout(this.resetForm,5000);
     this.feedbackFormDirective.resetForm();
+    
   }
 }
