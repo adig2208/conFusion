@@ -34,6 +34,7 @@ import { HttpClientModule } from '@angular/common/http';
 import {ProcessHTTPMsgService} from './services/process-httpmsg.service';
 import { baseURL } from './shared/baseurl';
 import 'hammerjs';
+import { HighlightDirective } from './directives/highlight.directive';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import 'hammerjs';
     AboutComponent,
     HomeComponent,
     ContactComponent,
-    LoginComponent
+    LoginComponent,
+    HighlightDirective
   ],
   imports: [
     BrowserModule,
